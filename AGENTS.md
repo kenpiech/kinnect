@@ -17,7 +17,7 @@ A text-only social app: add people as friends and read what they post. Spelled w
 - **Simulated network.** The friends are seeded sample people (`src/data/people.ts`). Each post has a `dayOffset` and an `hour`, and it goes live at `firstVisit + dayOffset days + hour`, so coming back on a later day shows new posts. The UI says these are sample friends saved on this device.
 - **One storage module.** Only `src/lib/store.ts` touches localStorage, under one versioned key (`kinnect:v1`). Keep it that way, so a real database can replace it later.
 - **Mobile first.** Design for a phone first: tabs in a bottom bar, tap targets of at least 44px, one column. Wider screens get the same column, with the tabs moved into the top bar.
-- **Text only.** No images for now.
+- **Text-only posts.** Posts have no images for now. The sample friends have cartoon SVG avatars in `public/avatars/`, drawn by `scripts/avatars.py`. Change the script and rerun it; don't hand-edit the SVGs.
 - **Style.** Swiss: Inter Tight, an off-white background, black text, one red accent, square corners, a strict grid. Use the shared components in `src/components/`; don't restyle one-off elements.
 - **Forms.** One column. Every field has a real `<label>`. Errors sit under the field (linked with `aria-describedby`) and say what to do next, and the typed value is never cleared on error.
 - **Accessibility.** Everything works with a keyboard, and focus is always visible.

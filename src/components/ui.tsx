@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { forwardRef, useCallback, useEffect, useId, useState } from "react";
 
@@ -163,8 +164,22 @@ export function PageHeader({ title, children }: { title: string; children?: Reac
   );
 }
 
-// A square of initials, standing in for a profile photo (Kinnect is text only).
-export function Avatar({ name, size = "md" }: { name: string; size?: "md" | "lg" }) {
+// A cartoon portrait for the sample friends (public/avatars, drawn by
+// scripts/avatars.py), or your initials for you.
+export function Avatar({ name, handle, size = "md" }: { name: string; handle?: string; size?: "md" | "lg" }) {
+  const box = size === "lg" ? "size-16" : "size-12";
+  if (handle) {
+    return (
+      <Image
+        src={`/avatars/${handle}.svg`}
+        alt=""
+        width={64}
+        height={64}
+        unoptimized
+        className={`${box} shrink-0 rounded-full`}
+      />
+    );
+  }
   const initials = name
     .split(/\s+/)
     .map((w) => w[0])
@@ -174,7 +189,7 @@ export function Avatar({ name, size = "md" }: { name: string; size?: "md" | "lg"
   return (
     <span
       aria-hidden="true"
-      className={`grid shrink-0 place-items-center bg-ink font-bold text-paper ${size === "lg" ? "size-14 text-lg" : "size-10 text-sm"}`}
+      className={`${box} grid shrink-0 place-items-center rounded-full bg-ink font-bold text-paper ${size === "lg" ? "text-lg" : "text-sm"}`}
     >
       {initials}
     </span>

@@ -24,7 +24,7 @@ export function PostCard({ post, myName }: { post: FeedPost; myName: string }) {
 
   return (
     <article className="flex gap-3 border-b border-ink py-4">
-      <Avatar name={name} />
+      <Avatar name={name} handle={mine ? undefined : post.author} />
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
           <span className="font-bold text-base">{name}</span>
@@ -56,7 +56,7 @@ export function PersonCard({
   return (
     <li className="border-b border-ink">
       <div className="flex items-center gap-3 py-3">
-      <Avatar name={person.name} />
+      <Avatar name={person.name} handle={person.handle} />
       <div className="min-w-0 flex-1">
         <p className="font-bold">
           {person.name} <span className="font-normal text-muted">@{person.handle}</span>
