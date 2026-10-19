@@ -52,9 +52,10 @@ Kinnect remembers your friends and when you last visited, so it can show what's 
 
 ```mermaid
 flowchart TD
-    R([Open Kinnect<br/>a day later]) --> S{Friends saved?}
+    R([Open Kinnect again<br/>new tab, reopen or reload]) --> S{Friends saved?}
     S -->|No| W0["/ First visit<br/>People you might know"]
     S -->|Yes| W["/feed<br/>Welcome back.<br/>N new posts since Sunday"]
+    W -->|Nothing new| NX[Next up: Rosa,<br/>around 6 PM]
     W --> NEW[New posts]
     NEW --> DIV[New since your last visit divider]
     DIV --> OLD[Older posts]

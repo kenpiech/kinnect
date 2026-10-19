@@ -10,14 +10,12 @@ import { personByHandle, seedPosts, type SeedPost } from "@/data/people";
 const KEY = "kinnect:v1";
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
-// A gap this long since you were last here counts as a new visit
-const NEW_VISIT_GAP = 30 * 60 * 1000;
 
 export type MyPost = { id: string; text: string; createdAt: number };
 
 export type State = {
   firstVisit: number | null;
-  // When you were last active, and when you were last active before this visit
+  // When you last left Kinnect, and when you left it before this visit
   lastSeen: number | null;
   previousVisit: number | null;
   name: string;
@@ -47,6 +45,7 @@ const empty: State = {
 let state: State = empty;
 let loaded = false;
 let storageOk = true;
+let sessionStarted = false;
 const listeners = new Set<() => void>();
 
 function load() {
@@ -102,19 +101,28 @@ export function isStorageOk() {
   return storageOk;
 }
 
-// Call once when the app opens. Starts the clock on the first visit and, if
-// you've been away a while, remembers when you were last here so the feed can
-// show what's new since then.
+// Call when the app opens. Every fresh open (a new tab, reopening the app,
+// a reload) is a new visit: it remembers when you last left, so the feed can
+// welcome you back and show what's new since then. Moving between pages
+// doesn't count. Only the first call per page load does anything.
 export function startSession(now = Date.now()) {
+  if (sessionStarted) return;
+  sessionStarted = true;
   load();
   const s = state;
-  const away = s.lastSeen !== null && now - s.lastSeen > NEW_VISIT_GAP;
   save({
     ...s,
     firstVisit: s.firstVisit ?? now,
-    previousVisit: away ? s.lastSeen : s.previousVisit,
+    previousVisit: s.lastSeen,
     lastSeen: now,
   });
+}
+
+// Call when the page is hidden or closed, so "since your last visit" counts
+// from when you left rather than when you arrived.
+export function markSeen(now = Date.now()) {
+  if (!loaded) return;
+  save({ ...state, lastSeen: now });
 }
 
 // When a sample post goes live. Day 0 posts land in the 24 hours before your
@@ -145,14 +153,39 @@ export function newSinceLastVisit(s: State, now = Date.now()): FeedPost[] {
   return feed(s, now).filter((p) => p.author !== "me" && p.at > s.previousVisit!);
 }
 
-// "yesterday", "Sunday", "Oct 3": when you were last here, in words.
+// "your last visit", "yesterday", "Sunday", "Oct 3": when you were last here, in words.
 export function sinceWhen(at: number, now = Date.now()) {
   const day = (t: number) => new Date(t).setHours(0, 0, 0, 0);
   const days = Math.round((day(now) - day(at)) / DAY);
+  if (now - at < HOUR) return "your last visit";
   if (days <= 0) return "earlier today";
   if (days === 1) return "yesterday";
   if (days < 7) return new Date(at).toLocaleDateString("en-US", { weekday: "long" });
   return new Date(at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+// The next sample post due from one of your friends, so a quiet feed can say
+// when to come back.
+export function nextFriendPost(s: State, now = Date.now()) {
+  if (s.firstVisit === null) return null;
+  const friends = new Set(s.friends);
+  let next: { author: string; at: number } | null = null;
+  for (const p of seedPosts) {
+    if (!friends.has(p.author)) continue;
+    const at = visibleAt(p, s.firstVisit);
+    if (at > now && (!next || at < next.at)) next = { author: p.author, at };
+  }
+  return next;
+}
+
+// "around 6 PM", "tomorrow around 9 AM", "Thursday around 7 PM"
+export function aroundWhen(at: number, now = Date.now()) {
+  const day = (t: number) => new Date(t).setHours(0, 0, 0, 0);
+  const days = Math.round((day(at) - day(now)) / DAY);
+  const time = new Date(at).toLocaleTimeString("en-US", { hour: "numeric" });
+  if (days === 0) return `around ${time}`;
+  if (days === 1) return `tomorrow around ${time}`;
+  return `${new Date(at).toLocaleDateString("en-US", { weekday: "long" })} around ${time}`;
 }
 
 export function normalizeHandle(input: string) {

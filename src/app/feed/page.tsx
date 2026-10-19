@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { PersonCard, PostCard } from "@/components/cards";
 import { Avatar, Banner, PageHeader, TextLink, Toast, plural, useToast } from "@/components/ui";
 import { people, personByHandle } from "@/data/people";
-import { addFriend, feed, newSinceLastVisit, sinceWhen, takeFlash, useStore } from "@/lib/store";
+import { addFriend, aroundWhen, feed, newSinceLastVisit, nextFriendPost, sinceWhen, takeFlash, useStore } from "@/lib/store";
 
 // The main screen: your friends' posts and your own, newest first. No
 // algorithm. It's never a blank page: with no friends it suggests people,
@@ -27,6 +27,7 @@ export default function Feed() {
   const hasPosted = s.myPosts.length > 0;
   const fresh = newSinceLastVisit(s);
   const freshFrom = new Set(fresh.map((p) => p.author)).size;
+  const next = nextFriendPost(s);
   // The divider goes under the oldest new post
   const lastFreshId = fresh.at(-1)?.id;
 
@@ -63,9 +64,14 @@ export default function Feed() {
         {plural(s.friends.length, "friend")} · newest first
       </PageHeader>
 
-      {s.previousVisit !== null && fresh.length > 0 && (
+      {s.previousVisit !== null && (
         <Banner tone="accent" title="Welcome back.">
-          {plural(fresh.length, "new post")} from {plural(freshFrom, "friend")} since {sinceWhen(s.previousVisit)}.
+          {fresh.length > 0
+            ? `${plural(fresh.length, "new post")} from ${plural(freshFrom, "friend")} since ${sinceWhen(s.previousVisit)}.`
+            : `Nothing new since ${sinceWhen(s.previousVisit)}.`}
+          {fresh.length === 0 && next && (
+            <> Next up: {personByHandle.get(next.author)!.name.split(" ")[0]}, {aroundWhen(next.at)}.</>
+          )}
         </Banner>
       )}
 
