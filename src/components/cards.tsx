@@ -5,7 +5,7 @@ import { personByHandle } from "@/data/people";
 import type { FeedPost } from "@/lib/store";
 import { Avatar, Button } from "./ui";
 
-export function timeAgo(at: number, now = Date.now()) {
+export function timeAgo(at: number, now: number) {
   const mins = Math.round((now - at) / 60000);
   if (mins < 1) return "just now";
   if (mins < 60) return `${mins}m ago`;
@@ -16,20 +16,33 @@ export function timeAgo(at: number, now = Date.now()) {
   return `${days} days ago`;
 }
 
-// One post in a feed. Your own posts show your display name.
-export function PostCard({ post, myName }: { post: FeedPost; myName: string }) {
+// One post in a feed. Your own posts show your display name. A post that
+// arrived while you were reading fades in.
+export function PostCard({
+  post,
+  myName,
+  now,
+  arrived,
+}: {
+  post: FeedPost;
+  myName: string;
+  now: number;
+  arrived?: boolean;
+}) {
   const mine = post.author === "me";
   const person = mine ? null : personByHandle.get(post.author);
   const name = mine ? myName : (person?.name ?? post.author);
 
   return (
-    <article className="flex gap-3 border-b border-rule py-5">
+    <article
+      className={`flex gap-3 border-b border-rule py-5 ${arrived ? "animate-[arrive_.6s_ease-out] motion-reduce:animate-none" : ""}`}
+    >
       <Avatar name={name} handle={mine ? undefined : post.author} />
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-baseline gap-x-2 text-[15px] leading-snug">
           <span className="font-semibold text-[17px]">{name}</span>
           {!mine && <span className="text-muted">@{post.author}</span>}
-          <span className="text-muted">· {timeAgo(post.at)}</span>
+          <span className="text-muted">· {timeAgo(post.at, now)}</span>
         </p>
         <p className="mt-1.5 whitespace-pre-wrap break-words text-[18px] leading-relaxed">{post.text}</p>
       </div>

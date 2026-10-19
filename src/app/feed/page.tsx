@@ -5,7 +5,18 @@ import { useEffect } from "react";
 import { PersonCard, PostCard } from "@/components/cards";
 import { Avatar, Banner, PageHeader, TextLink, Toast, plural, useToast } from "@/components/ui";
 import { people, personByHandle } from "@/data/people";
-import { addFriend, aroundWhen, feed, newSinceLastVisit, nextFriendPost, sinceWhen, takeFlash, useStore } from "@/lib/store";
+import {
+  addFriend,
+  aroundWhen,
+  feed,
+  newSinceLastVisit,
+  nextFriendPost,
+  sessionStartedAt,
+  sinceWhen,
+  takeFlash,
+  useNow,
+  useStore,
+} from "@/lib/store";
 
 // The main screen: your friends' posts and your own, newest first. No
 // algorithm. It's never a blank page: with no friends it suggests people,
@@ -14,6 +25,7 @@ import { addFriend, aroundWhen, feed, newSinceLastVisit, nextFriendPost, sinceWh
 export default function Feed() {
   const s = useStore();
   const [toast, setToast] = useToast();
+  const now = useNow(s);
 
   // Pick up a message left by the page that sent us here ("Added Gus…")
   useEffect(() => {
@@ -23,11 +35,12 @@ export default function Feed() {
 
   if (!s) return <p className="text-muted">Loading…</p>;
 
-  const posts = feed(s);
+  const posts = feed(s, now);
   const hasPosted = s.myPosts.length > 0;
-  const fresh = newSinceLastVisit(s);
+  const fresh = newSinceLastVisit(s, now);
   const freshFrom = new Set(fresh.map((p) => p.author)).size;
-  const next = nextFriendPost(s);
+  const next = nextFriendPost(s, now);
+  const arrivedAfter = sessionStartedAt() ?? now;
   // The divider goes under the oldest new post
   const lastFreshId = fresh.at(-1)?.id;
 
@@ -67,10 +80,10 @@ export default function Feed() {
       {s.previousVisit !== null && (
         <Banner tone="accent" title="Welcome back.">
           {fresh.length > 0
-            ? `${plural(fresh.length, "new post")} from ${plural(freshFrom, "friend")} since ${sinceWhen(s.previousVisit)}.`
-            : `Nothing new since ${sinceWhen(s.previousVisit)}.`}
+            ? `${plural(fresh.length, "new post")} from ${plural(freshFrom, "friend")} since ${sinceWhen(s.previousVisit, now)}.`
+            : `Nothing new since ${sinceWhen(s.previousVisit, now)}.`}
           {fresh.length === 0 && next && (
-            <> Next up: {personByHandle.get(next.author)!.name.split(" ")[0]}, {aroundWhen(next.at)}.</>
+            <> Next up: {personByHandle.get(next.author)!.name.split(" ")[0]}, {aroundWhen(next.at, now)}.</>
           )}
         </Banner>
       )}
@@ -91,7 +104,7 @@ export default function Feed() {
       <section aria-label="Posts">
         {posts.map((post) => (
           <div key={post.id}>
-            <PostCard post={post} myName={s.name} />
+            <PostCard post={post} myName={s.name} now={now} arrived={post.author !== "me" && post.at > arrivedAfter} />
             {post.id === lastFreshId && (
               <p className="flex items-center gap-3 py-3 text-[14px] italic text-accent before:h-px before:flex-1 before:bg-accent/40 after:h-px after:flex-1 after:bg-accent/40">
                 ↑ New since your last visit

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { personByHandle, seedPosts, type SeedPost } from "@/data/people";
 
 // The only code that touches localStorage. Everything Kinnect remembers lives
@@ -10,8 +10,15 @@ import { personByHandle, seedPosts, type SeedPost } from "@/data/people";
 const KEY = "kinnect:v1";
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
+// Fast-forward for testing: one sample day every 20 seconds
+export const FAST_SPEED = DAY / 20_000;
 
 export type MyPost = { id: string; text: string; createdAt: number };
+
+// Kinnect keeps its own clock so it can fast-forward for testing. Sample time
+// = anchorSample + (real time since anchorReal) × speed. At speed 1 it's just
+// the real time. Every timestamp saved below is in sample time.
+export type Clock = { anchorReal: number; anchorSample: number; speed: number };
 
 export type State = {
   firstVisit: number | null;
@@ -23,6 +30,7 @@ export type State = {
   myPosts: MyPost[];
   // A one-time message for the next page to show, e.g. after adding a friend
   flash: string | null;
+  clock: Clock;
 };
 
 export type FeedPost = {
@@ -40,12 +48,14 @@ const empty: State = {
   friends: [],
   myPosts: [],
   flash: null,
+  clock: { anchorReal: 0, anchorSample: 0, speed: 1 },
 };
 
 let state: State = empty;
 let loaded = false;
 let storageOk = true;
 let sessionStarted = false;
+let sessionStart: number | null = null;
 const listeners = new Set<() => void>();
 
 function load() {
@@ -101,15 +111,47 @@ export function isStorageOk() {
   return storageOk;
 }
 
+// The current time on Kinnect's clock.
+export function sampleNow(s: State = state) {
+  return s.clock.anchorSample + (Date.now() - s.clock.anchorReal) * s.clock.speed;
+}
+
+// Re-renders on a timer so new posts appear without a reload: every second in
+// fast-forward, every half minute otherwise. Returns the clock's time.
+export function useNow(s: State | null) {
+  const [, setTick] = useState(0);
+  const fast = !!s && s.clock.speed > 1;
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), fast ? 1000 : 30_000);
+    return () => clearInterval(id);
+  }, [fast]);
+  return s ? sampleNow(s) : 0;
+}
+
+// Turns fast-forward on (FAST_SPEED) or off (1). Time carries on from where it
+// is, so nothing jumps when you switch.
+export function setSpeed(speed: number) {
+  load();
+  save({ ...state, clock: { anchorReal: Date.now(), anchorSample: sampleNow(), speed } });
+}
+
+// When this visit started, on Kinnect's clock. Posts newer than this arrived
+// while you were here.
+export function sessionStartedAt() {
+  return sessionStart;
+}
+
 // Call when the app opens. Every fresh open (a new tab, reopening the app,
 // a reload) is a new visit: it remembers when you last left, so the feed can
 // welcome you back and show what's new since then. Moving between pages
 // doesn't count. Only the first call per page load does anything.
-export function startSession(now = Date.now()) {
+export function startSession() {
   if (sessionStarted) return;
   sessionStarted = true;
   load();
   const s = state;
+  const now = sampleNow(s);
+  sessionStart = now;
   save({
     ...s,
     firstVisit: s.firstVisit ?? now,
@@ -120,9 +162,9 @@ export function startSession(now = Date.now()) {
 
 // Call when the page is hidden or closed, so "since your last visit" counts
 // from when you left rather than when you arrived.
-export function markSeen(now = Date.now()) {
+export function markSeen() {
   if (!loaded) return;
-  save({ ...state, lastSeen: now });
+  save({ ...state, lastSeen: sampleNow() });
 }
 
 // When a sample post goes live. Day 0 posts land in the 24 hours before your
@@ -132,7 +174,7 @@ export function visibleAt(post: SeedPost, firstVisit: number) {
 }
 
 // Everyone's posts that are live now, newest first. Used on the welcome screen.
-export function livePosts(s: State, now = Date.now()): FeedPost[] {
+export function livePosts(s: State, now = sampleNow(s)): FeedPost[] {
   const start = s.firstVisit ?? now;
   return seedPosts
     .map((p) => ({ id: p.id, author: p.author, text: p.text, at: visibleAt(p, start) }))
@@ -141,20 +183,20 @@ export function livePosts(s: State, now = Date.now()): FeedPost[] {
 }
 
 // Your feed: your friends' live posts plus your own, newest first.
-export function feed(s: State, now = Date.now()): FeedPost[] {
+export function feed(s: State, now = sampleNow(s)): FeedPost[] {
   const friends = new Set(s.friends);
   const mine = s.myPosts.map((p) => ({ id: p.id, author: "me", text: p.text, at: p.createdAt }));
   return [...livePosts(s, now).filter((p) => friends.has(p.author)), ...mine].sort((a, b) => b.at - a.at);
 }
 
 // Friends' posts that went live since your previous visit.
-export function newSinceLastVisit(s: State, now = Date.now()): FeedPost[] {
+export function newSinceLastVisit(s: State, now = sampleNow(s)): FeedPost[] {
   if (s.previousVisit === null) return [];
   return feed(s, now).filter((p) => p.author !== "me" && p.at > s.previousVisit!);
 }
 
 // "your last visit", "yesterday", "Sunday", "Oct 3": when you were last here, in words.
-export function sinceWhen(at: number, now = Date.now()) {
+export function sinceWhen(at: number, now: number) {
   const day = (t: number) => new Date(t).setHours(0, 0, 0, 0);
   const days = Math.round((day(now) - day(at)) / DAY);
   if (now - at < HOUR) return "your last visit";
@@ -166,7 +208,7 @@ export function sinceWhen(at: number, now = Date.now()) {
 
 // The next sample post due from one of your friends, so a quiet feed can say
 // when to come back.
-export function nextFriendPost(s: State, now = Date.now()) {
+export function nextFriendPost(s: State, now = sampleNow(s)) {
   if (s.firstVisit === null) return null;
   const friends = new Set(s.friends);
   let next: { author: string; at: number } | null = null;
@@ -179,7 +221,7 @@ export function nextFriendPost(s: State, now = Date.now()) {
 }
 
 // "around 6 PM", "tomorrow around 9 AM", "Thursday around 7 PM"
-export function aroundWhen(at: number, now = Date.now()) {
+export function aroundWhen(at: number, now: number) {
   const day = (t: number) => new Date(t).setHours(0, 0, 0, 0);
   const days = Math.round((day(at) - day(now)) / DAY);
   const time = new Date(at).toLocaleTimeString("en-US", { hour: "numeric" });
@@ -227,7 +269,7 @@ export function addPost(text: string): { ok: true } | { ok: false; error: string
     const over = trimmed.length - MAX_POST;
     return { ok: false, error: `Cut ${over} character${over === 1 ? "" : "s"} to post.` };
   }
-  const post = { id: `me-${Date.now()}`, text: trimmed, createdAt: Date.now() };
+  const post = { id: `me-${Date.now()}`, text: trimmed, createdAt: sampleNow() };
   save({ ...state, myPosts: [...state.myPosts, post] });
   return { ok: true };
 }
@@ -250,6 +292,14 @@ export function takeFlash() {
   return message;
 }
 
+// Starts over as a first visit. Fast-forward stays as it was.
 export function resetAll() {
-  save({ ...empty, firstVisit: Date.now(), lastSeen: Date.now() });
+  const now = Date.now();
+  sessionStart = now;
+  save({
+    ...empty,
+    firstVisit: now,
+    lastSeen: now,
+    clock: { anchorReal: now, anchorSample: now, speed: state.clock.speed },
+  });
 }

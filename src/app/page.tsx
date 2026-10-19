@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { PersonCard, PostCard } from "@/components/cards";
 import { Button, ButtonLink, Toast, plural, useToast } from "@/components/ui";
 import { people, personByHandle } from "@/data/people";
-import { addAllFriends, addFriend, feed, livePosts, useStore } from "@/lib/store";
+import { addAllFriends, addFriend, feed, livePosts, useNow, useStore } from "@/lib/store";
 
 // The first visit. No sign-up and no empty screen: a line on what Kinnect is,
 // a few real posts, and people you can add with one tap.
@@ -13,6 +13,7 @@ export default function Welcome() {
   const s = useStore();
   const router = useRouter();
   const [toast, setToast] = useToast();
+  const now = useNow(s);
   // Friends you didn't add on this screen mean you've been here before
   const [addedHere, setAddedHere] = useState(false);
   const returning = !!s && s.friends.length > 0 && !addedHere;
@@ -23,11 +24,11 @@ export default function Welcome() {
 
   if (!s || returning) return <p className="text-muted">Loading…</p>;
 
-  const live = livePosts(s);
+  const live = livePosts(s, now);
   // One recent post each from two different people
   const preview = live.filter((p, i) => live.findIndex((q) => q.author === p.author) === i).slice(0, 2);
   const notAdded = people.filter((p) => !s.friends.includes(p.handle));
-  const feedCount = feed(s).length;
+  const feedCount = feed(s, now).length;
 
   function add(handle: string) {
     setAddedHere(true);
@@ -57,7 +58,7 @@ export default function Welcome() {
           On Kinnect right now
         </h2>
         {preview.map((post) => (
-          <PostCard key={post.id} post={post} myName={s.name} />
+          <PostCard key={post.id} post={post} myName={s.name} now={now} />
         ))}
       </section>
 
@@ -84,7 +85,7 @@ export default function Welcome() {
                 {newest && (
                   <div className="mb-4 rounded-2xl bg-surface px-4 pt-3 [&>article]:border-b-0 [&>article]:pt-1 [&>article]:pb-3">
                     <p className="text-[14px] italic text-muted">Their newest post</p>
-                    <PostCard post={newest} myName={s.name} />
+                    <PostCard post={newest} myName={s.name} now={now} />
                   </div>
                 )}
               </PersonCard>
