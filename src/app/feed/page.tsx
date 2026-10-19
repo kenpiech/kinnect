@@ -41,6 +41,30 @@ export default function Feed() {
   const freshFrom = new Set(fresh.map((p) => p.author)).size;
   const next = nextFriendPost(s, now);
   const arrivedAfter = sessionStartedAt() ?? now;
+
+  // Invites a first post, or brings back an unfinished draft
+  const prompt = (!hasPosted || s.draft.trim()) && (
+    <Link
+      href="/post/new"
+      className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-4 hover:bg-hover"
+    >
+      <Avatar name={s.name} handle="me" />
+      <span className="min-w-0 flex-1">
+        {s.draft.trim() ? (
+          <>
+            <span className="block font-semibold">Finish your draft</span>
+            <span className="line-clamp-1 block text-[15px] text-muted">“{s.draft.trim()}”</span>
+          </>
+        ) : (
+          <>
+            <span className="block font-semibold">What are you up to?</span>
+            <span className="block text-[15px] text-muted">Write your first post. It goes at the top of your feed.</span>
+          </>
+        )}
+      </span>
+    </Link>
+  );
+
   // The divider goes under the oldest new post
   const lastFreshId = fresh.at(-1)?.id;
 
@@ -53,6 +77,7 @@ export default function Feed() {
     return (
       <div className="grid gap-8">
         <PageHeader title="Your feed">Add someone, and their posts show up here.</PageHeader>
+        {s.draft.trim() && prompt}
         <section aria-labelledby="suggested" className="grid gap-1">
           <h2 id="suggested" className="label border-b border-rule pb-2 text-muted">
             People you might know
@@ -88,18 +113,7 @@ export default function Feed() {
         </Banner>
       )}
 
-      {!hasPosted && (
-        <Link
-          href="/post/new"
-          className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-4 hover:bg-hover"
-        >
-          <Avatar name={s.name} handle="me" />
-          <span className="flex-1">
-            <span className="block font-semibold">What are you up to?</span>
-            <span className="block text-[15px] text-muted">Write your first post. It goes at the top of your feed.</span>
-          </span>
-        </Link>
-      )}
+      {prompt}
 
       <section aria-label="Posts">
         {posts.map((post) => (

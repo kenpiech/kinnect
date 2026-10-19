@@ -28,6 +28,8 @@ export type State = {
   name: string;
   friends: string[]; // handles, in the order you added them
   myPosts: MyPost[];
+  // A post you started and haven't published yet
+  draft: string;
   // A one-time message for the next page to show, e.g. after adding a friend
   flash: string | null;
   clock: Clock;
@@ -47,6 +49,7 @@ const empty: State = {
   name: "You",
   friends: [],
   myPosts: [],
+  draft: "",
   flash: null,
   clock: { anchorReal: 0, anchorSample: 0, speed: 1 },
 };
@@ -316,8 +319,14 @@ export function addPost(text: string): { ok: true } | { ok: false; error: string
     return { ok: false, error: `Cut ${over} character${over === 1 ? "" : "s"} to post.` };
   }
   const post = { id: `me-${Date.now()}`, text: trimmed, createdAt: sampleNow() };
-  save({ ...state, myPosts: [...state.myPosts, post] });
+  save({ ...state, myPosts: [...state.myPosts, post], draft: "" });
   return { ok: true };
+}
+
+// Saves what you're writing as you type, so leaving the page doesn't lose it.
+export function setDraft(text: string) {
+  load();
+  if (text !== state.draft) save({ ...state, draft: text });
 }
 
 export function setName(name: string): { ok: true } | { ok: false; error: string } {

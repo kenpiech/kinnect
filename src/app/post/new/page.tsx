@@ -3,13 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Button, Field, PageHeader, TextLink } from "@/components/ui";
-import { MAX_POST, addPost, setFlash } from "@/lib/store";
+import { MAX_POST, addPost, setDraft, setFlash, useStore } from "@/lib/store";
 
-// The second form: write a post. A live count shows what's left. Errors sit
-// under the box, say what to do, and never clear what you wrote.
+// The second form: write a post. A live count shows what's left. What you
+// write is saved as a draft as you type, so leaving doesn't lose it. Errors
+// sit under the box, say what to do, and never clear what you wrote.
 export default function NewPost() {
   const router = useRouter();
-  const [text, setText] = useState("");
+  const s = useStore();
+  const text = s?.draft ?? "";
   const [error, setError] = useState<string | undefined>();
   const box = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
 
@@ -40,10 +42,11 @@ export default function NewPost() {
           ref={box}
           multiline
           label="What are you up to?"
+          hint={text.trim() ? "Draft saved on this device." : undefined}
           error={error}
           value={text}
           onChange={(e) => {
-            setText(e.target.value);
+            setDraft(e.target.value);
             if (error) setError(undefined);
           }}
           placeholder="Ran my first 5K. Legs are jelly."
