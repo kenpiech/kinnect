@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter_Tight } from "next/font/google";
 import { NavBar } from "@/components/NavBar";
+import { Session } from "@/components/Session";
 import "./globals.css";
 
 const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight" });
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom))] font-sans sm:pb-0">
         <NavBar />
         <main id="main" tabIndex={-1} className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:py-8">
+          <Session />
           {children}
         </main>
         <footer className="border-t border-ink">

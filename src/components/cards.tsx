@@ -43,15 +43,19 @@ export function PersonCard({
   added,
   onAdd,
   action,
+  children,
 }: {
   person: Person;
   added?: boolean;
   onAdd?: () => void;
   // Replaces the Add button, e.g. Remove on the friends list
   action?: React.ReactNode;
+  // Shown under the row, e.g. the newest post of someone you just added
+  children?: React.ReactNode;
 }) {
   return (
-    <li className="flex items-center gap-3 border-b border-ink py-3">
+    <li className="border-b border-ink">
+      <div className="flex items-center gap-3 py-3">
       <Avatar name={person.name} />
       <div className="min-w-0 flex-1">
         <p className="font-bold">
@@ -67,6 +71,8 @@ export function PersonCard({
             + Add
           </Button>
         ))}
+      </div>
+      {children}
     </li>
   );
 }

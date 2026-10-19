@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { forwardRef, useId } from "react";
+import { forwardRef, useCallback, useEffect, useId, useState } from "react";
 
 // Shared building blocks. Every page uses these instead of styling its own
 // buttons, fields or notices, so Kinnect looks and behaves the same everywhere.
@@ -127,14 +127,31 @@ export function Banner({
   );
 }
 
-// A short confirmation after an action ("Added @milemarker"). It lives in a
-// polite live region so screen readers announce it without moving focus.
+// A short confirmation after an action ("Added Rosa"). It sits just under the
+// top bar, clear of the bottom tabs, in a polite live region so screen
+// readers announce it without moving focus. It fades after a few seconds.
 export function Toast({ message }: { message: string | null }) {
   return (
-    <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-20 z-30 sm:bottom-6 flex justify-center px-4">
+    <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 top-16 z-30 flex justify-center px-4">
       {message && <p className="bg-ink px-5 py-3 text-sm font-semibold text-paper">{message}</p>}
     </div>
   );
+}
+
+export function useToast(ms = 4000) {
+  const [message, setMessage] = useState<string | null>(null);
+  useEffect(() => {
+    if (!message) return;
+    const t = setTimeout(() => setMessage(null), ms);
+    return () => clearTimeout(t);
+  }, [message, ms]);
+  // A new object each time, so the same message twice still shows
+  const show = useCallback((m: string) => setMessage(m), []);
+  return [message, show] as const;
+}
+
+export function plural(n: number, word: string) {
+  return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 
 export function PageHeader({ title, children }: { title: string; children?: React.ReactNode }) {
