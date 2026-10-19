@@ -149,7 +149,39 @@ npm run dev   # http://localhost:3000
 
 ## First-run check
 
-_Coming next: an agent tries the live site as a brand-new user._
+Once Kinnect was live, a subagent used it as a brand-new user. It drove a headless Chrome at phone size (390×844) from an empty profile, looked at screenshots after each step, and never read the code.
+
+Its goal: **"Add three friends and post what you're up to this week."** After that it closed the browser, came back with the same profile, tried fast-forward (`?fast`), and spent a minute using only the keyboard.
+
+**First impression.** "Within 5 seconds the headline and subtitle made it clear: a calm text feed of people you pick." It had a friend and real posts in its feed in about 10 seconds.
+
+**What worked**
+- The errors are specific and kind. Each keeps what you typed and keeps focus in the field. For example: "No one named 'Rosa Delgato'. Check the spelling or pick someone below." and "Cut 60 characters to post."
+- The type-ahead finds people by partial name or handle, ignoring capitals, and works with the arrow keys.
+- Every action confirms itself with a toast ("Added Rosa Delgado. 2 posts in your feed.").
+- In fast-forward, new posts arrive without moving what you're reading, and the "↑ New since your last visit" divider marks where you left off.
+- The skip link, visible focus rings and active-tab marker all work. The posts are "funny and in character… so I wanted to read on."
+
+**Usability problems it found** (most important first)
+1. A half-written post is silently lost if you leave the composer.
+2. Removing a friend is one tap with no undo.
+3. Picking someone in the type-ahead only fills in their handle. You still have to press Add friend, even though the copy says "pick someone, and their posts join your feed."
+4. The two Add buttons behave differently. The form sends you to the feed after each add, but the list's **+ Add** keeps you on the page, so adding three friends with the form takes three round trips.
+5. A mistyped name gets no "Did you mean Rosa Delgado?"
+6. "Welcome back" shows seconds into the first visit. "Next up: Rosa, around 5 PM" reveals that friends post on a schedule.
+7. Toasts cover the page heading for a couple of seconds.
+8. Your own post is a dead end: no edit or delete, and no reactions.
+9. Keyboard:
+   - Tab goes from the header to the bottom tabs and back up to Write.
+   - Focus stays on the tab after changing pages.
+   - The post box isn't focused when the composer opens.
+10. Small things: fast-forward stays on across visits, and Reset demo data sits near the tab bar.
+
+**Coming back.** "The return visit had a hook… but nothing came back to me. My post got no replies or reactions." It suggested friends reacting to your posts, a "N new posts ↑" pill, and a weekly "What's up this week?" prompt.
+
+### What I changed
+
+_In progress._
 
 ## How I worked with the agent
 
