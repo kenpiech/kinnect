@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { PersonCard, PostCard } from "@/components/cards";
-import { Avatar, PageHeader, TextLink, Toast, plural, useToast } from "@/components/ui";
+import { Avatar, Banner, PageHeader, TextLink, Toast, plural, useToast } from "@/components/ui";
 import { people, personByHandle } from "@/data/people";
-import { addFriend, feed, takeFlash, useStore } from "@/lib/store";
+import { addFriend, feed, newSinceLastVisit, sinceWhen, takeFlash, useStore } from "@/lib/store";
 
 // The main screen: your friends' posts and your own, newest first. No
 // algorithm. It's never a blank page: with no friends it suggests people,
-// and until you've posted it invites your first post.
+// and until you've posted it invites your first post. Coming back after a
+// while, it says what's new and marks where the new posts end.
 export default function Feed() {
   const s = useStore();
   const [toast, setToast] = useToast();
@@ -24,6 +25,10 @@ export default function Feed() {
 
   const posts = feed(s);
   const hasPosted = s.myPosts.length > 0;
+  const fresh = newSinceLastVisit(s);
+  const freshFrom = new Set(fresh.map((p) => p.author)).size;
+  // The divider goes under the oldest new post
+  const lastFreshId = fresh.at(-1)?.id;
 
   function quickAdd(h: string) {
     const result = addFriend(h);
@@ -58,6 +63,12 @@ export default function Feed() {
         {plural(s.friends.length, "friend")} · newest first
       </PageHeader>
 
+      {s.previousVisit !== null && fresh.length > 0 && (
+        <Banner tone="accent" title="Welcome back.">
+          {plural(fresh.length, "new post")} from {plural(freshFrom, "friend")} since {sinceWhen(s.previousVisit)}.
+        </Banner>
+      )}
+
       {!hasPosted && (
         <Link
           href="/post/new"
@@ -73,7 +84,14 @@ export default function Feed() {
 
       <section aria-label="Posts">
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} myName={s.name} />
+          <div key={post.id}>
+            <PostCard post={post} myName={s.name} />
+            {post.id === lastFreshId && (
+              <p className="flex items-center gap-3 py-3 text-[14px] italic text-accent before:h-px before:flex-1 before:bg-accent/40 after:h-px after:flex-1 after:bg-accent/40">
+                ↑ New since your last visit
+              </p>
+            )}
+          </div>
         ))}
         <p className="py-8 text-center italic text-muted">
           You&rsquo;re all caught up.{" "}

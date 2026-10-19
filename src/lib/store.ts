@@ -145,6 +145,16 @@ export function newSinceLastVisit(s: State, now = Date.now()): FeedPost[] {
   return feed(s, now).filter((p) => p.author !== "me" && p.at > s.previousVisit!);
 }
 
+// "yesterday", "Sunday", "Oct 3": when you were last here, in words.
+export function sinceWhen(at: number, now = Date.now()) {
+  const day = (t: number) => new Date(t).setHours(0, 0, 0, 0);
+  const days = Math.round((day(now) - day(at)) / DAY);
+  if (days <= 0) return "earlier today";
+  if (days === 1) return "yesterday";
+  if (days < 7) return new Date(at).toLocaleDateString("en-US", { weekday: "long" });
+  return new Date(at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export function normalizeHandle(input: string) {
   return input.trim().replace(/^@/, "").toLowerCase();
 }
