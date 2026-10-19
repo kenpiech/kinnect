@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { personByHandle, seedPosts, type SeedPost } from "@/data/people";
+import { people, personByHandle, seedPosts, type SeedPost } from "@/data/people";
 
 // The only code that touches localStorage. Everything Kinnect remembers lives
 // under one versioned key, so a real database can replace this file later
@@ -231,19 +231,22 @@ export function aroundWhen(at: number, now: number) {
 }
 
 export function normalizeHandle(input: string) {
-  return input.trim().replace(/^@/, "").toLowerCase();
+  return input.trim().replace(/^@/, "").replace(/\s+/g, " ").toLowerCase();
 }
 
 export type AddResult = { ok: true; handle: string; postCount: number } | { ok: false; error: string };
 
-// Checks a typed handle and adds that person. The error messages say what to do next.
+// Checks a typed handle (or full name) and adds that person. The error
+// messages say what to do next.
 export function addFriend(input: string): AddResult {
-  const handle = normalizeHandle(input);
-  if (!handle) return { ok: false, error: "Enter a handle, like @bunkerbill." };
-  if (!personByHandle.has(handle)) {
-    return { ok: false, error: `No one named @${handle}. Check the spelling or pick someone below.` };
+  const typed = normalizeHandle(input);
+  if (!typed) return { ok: false, error: "Enter a name or handle, like @bunkerbill." };
+  const person = personByHandle.get(typed) ?? people.find((p) => p.name.toLowerCase() === typed);
+  if (!person) {
+    return { ok: false, error: `No one named “${input.trim()}”. Check the spelling or pick someone below.` };
   }
-  if (state.friends.includes(handle)) return { ok: false, error: `You're already friends with @${handle}.` };
+  const handle = person.handle;
+  if (state.friends.includes(handle)) return { ok: false, error: `You're already friends with ${person.name}.` };
 
   const postCount = livePosts(state).filter((p) => p.author === handle).length;
   save({ ...state, friends: [...state.friends, handle] });

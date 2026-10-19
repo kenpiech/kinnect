@@ -1,14 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { PersonCard } from "@/components/cards";
+import { TypeAheadList, matchPeople } from "@/components/TypeAhead";
 import { Button, Field, PageHeader, TextLink, Toast, plural, useToast } from "@/components/ui";
 import { people, personByHandle } from "@/data/people";
 import { addFriend, setFlash, useStore } from "@/lib/store";
 
-// The main form: add a friend by handle. Errors sit under the field, say
-// what to do next, and keep what you typed. Suggestions below are one tap.
+// The main form: add a friend by handle. Matches appear as you type (arrow
+// keys and Enter pick one). Errors sit under the field, say what to do next,
+// and keep what you typed. Suggestions below are one tap.
 export default function AddFriend() {
   const s = useStore();
   const router = useRouter();
@@ -16,9 +18,39 @@ export default function AddFriend() {
   const [error, setError] = useState<string | undefined>();
   const [toast, setToast] = useToast();
   const input = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
+  const listId = useId();
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(-1);
+  const matches = open ? matchPeople(people, handle) : [];
+  const showList = matches.length > 0;
+
+  function pick(h: string) {
+    setHandle(`@${h}`);
+    setOpen(false);
+    setActive(-1);
+    setError(undefined);
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (!showList) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive((i) => (i + 1) % matches.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive((i) => (i <= 0 ? matches.length - 1 : i - 1));
+    } else if (e.key === "Enter" && active >= 0) {
+      e.preventDefault();
+      pick(matches[active].handle);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+      setActive(-1);
+    }
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
+    setOpen(false);
     const result = addFriend(handle);
     if (!result.ok) {
       setError(result.error);
@@ -43,20 +75,40 @@ export default function AddFriend() {
         ← Back to feed
       </TextLink>
 
-      <PageHeader title="Add a friend">Type their handle, and their posts join your feed.</PageHeader>
+      <PageHeader title="Add a friend">Start typing, pick someone, and their posts join your feed.</PageHeader>
 
       <form onSubmit={submit} noValidate className="grid gap-4">
         <Field
           ref={input}
-          label="Handle"
-          hint="Everyone on Kinnect right now is a sample friend. Their handles are below."
+          label="Name or handle"
+          hint="Everyone on Kinnect right now is a sample friend. They're all listed below."
           error={error}
           value={handle}
           onChange={(e) => {
             setHandle(e.target.value);
+            setOpen(true);
+            setActive(-1);
             if (error) setError(undefined);
           }}
-          placeholder="@milemarker"
+          onKeyDown={onKeyDown}
+          onBlur={() => setOpen(false)}
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={showList}
+          aria-controls={listId}
+          aria-activedescendant={showList && active >= 0 ? `${listId}-${matches[active].handle}` : undefined}
+          below={
+            showList && (
+              <TypeAheadList
+                id={listId}
+                matches={matches}
+                active={active}
+                friends={s?.friends ?? []}
+                onPick={(p) => pick(p.handle)}
+              />
+            )
+          }
+          placeholder="Start typing a name or @handle"
           autoComplete="off"
           autoCapitalize="none"
           spellCheck={false}

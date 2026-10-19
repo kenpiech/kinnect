@@ -45,6 +45,8 @@ type FieldProps = {
   error?: string;
   // Shown at the right of the label row, e.g. a character count
   aside?: React.ReactNode;
+  // Shown right under the control, e.g. type-ahead suggestions
+  below?: React.ReactNode;
 };
 
 // A labelled input or textarea. The error sits right under the field, is
@@ -56,7 +58,7 @@ export const Field = forwardRef<
       | ({ multiline?: false } & React.InputHTMLAttributes<HTMLInputElement>)
       | ({ multiline: true } & React.TextareaHTMLAttributes<HTMLTextAreaElement>)
     )
->(function Field({ label, hint, error, aside, multiline, className = "", ...props }, ref) {
+>(function Field({ label, hint, error, aside, below, multiline, className = "", ...props }, ref) {
   const id = useId();
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
@@ -92,6 +94,7 @@ export const Field = forwardRef<
           {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
         />
       )}
+      {below}
       {error && (
         <p id={errorId} className="flex items-start gap-2 text-[15px] font-semibold text-danger">
           <span aria-hidden="true" className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-danger text-xs text-paper">!</span>

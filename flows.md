@@ -11,7 +11,7 @@ One row, read left to right, the same as the arrow sentence.
 ```mermaid
 flowchart LR
     S1["<b>1 · First visit</b><br/>/<br/>People you might know,<br/>one tap to add"]
-    S2["<b>2 · Add a friend</b><br/>/friends/add<br/>Type a handle,<br/>errors next to the field"]
+    S2["<b>2 · Add a friend</b><br/>/friends/add<br/>Type a name, pick a match,<br/>errors next to the field"]
     S3["<b>3 · It's in my feed</b><br/>/feed<br/>Added @x: their<br/>posts are here"]
     S4["<b>4 · Coming back</b><br/>/feed<br/>Welcome back.<br/>N new posts since Sunday"]
     S1 --> S2 --> S3 --> S4
@@ -23,10 +23,10 @@ Every error sits under the field, says what to do next, and keeps what you typed
 
 ```mermaid
 flowchart TD
-    A["/friends/add<br/>Handle field"] -->|Add friend| V{Valid?}
-    V -->|Empty| E1["Enter a handle,<br/>like @bunkerbill."]
-    V -->|Not found| E2["No one named @x.<br/>Check the spelling or<br/>pick someone below."]
-    V -->|Already friends| E3["You're already<br/>friends with @x."]
+    A["/friends/add<br/>Name or handle,<br/>matches as you type"] -->|Add friend| V{Valid?}
+    V -->|Empty| E1["Enter a name or handle,<br/>like @bunkerbill."]
+    V -->|Not found| E2["No one named “x”.<br/>Check the spelling or<br/>pick someone below."]
+    V -->|Already friends| E3["You're already<br/>friends with Rosa."]
     E1 & E2 & E3 --> FIX["Fix it and try again<br/>(what you typed is still there)"]
     FIX --> A
     V -->|Yes| OK["/feed<br/>Toast: Added @x,<br/>N posts in your feed"]
