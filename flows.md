@@ -4,44 +4,61 @@
 
 **Second task:** I write a post → it's at the top of my feed → it's still there when I come back.
 
-## The three flows
+## 1 · The main flow
+
+One row, read left to right, the same as the arrow sentence.
+
+```mermaid
+flowchart LR
+    S1["<b>1 · First visit</b><br/>/<br/>People you might know,<br/>one tap to add"]
+    S2["<b>2 · Add a friend</b><br/>/friends/add<br/>Type a handle,<br/>errors next to the field"]
+    S3["<b>3 · It's in my feed</b><br/>/feed<br/>Added @x: their<br/>posts are here"]
+    S4["<b>4 · Coming back</b><br/>/feed<br/>Welcome back.<br/>N new posts since Sunday"]
+    S1 --> S2 --> S3 --> S4
+```
+
+## 2 · The form and its errors
+
+Every error sits under the field, says what to do next, and keeps what you typed.
 
 ```mermaid
 flowchart TD
-    subgraph first["1 · First visit: useful right away"]
-        A([Open Kinnect<br/>nothing saved]) --> B["/ Welcome<br/>People you might know"]
-        B -->|"+ Add (one tap)"| C[Their newest post<br/>shows right away]
-        C -->|See your feed| F
-    end
+    A["/friends/add<br/>Handle field"] -->|Add friend| V{Valid?}
+    V -->|Empty| E1["Enter a handle,<br/>like @bunkerbill."]
+    V -->|Not found| E2["No one named @x.<br/>Check the spelling or<br/>pick someone below."]
+    V -->|Already friends| E3["You're already<br/>friends with @x."]
+    E1 & E2 & E3 --> FIX["Fix it and try again<br/>(what you typed is still there)"]
+    FIX --> A
+    V -->|Yes| OK["/feed<br/>Toast: Added @x,<br/>N posts in your feed"]
+```
 
-    subgraph task["2 · Main task: add a friend"]
-        N[Nav: Add friend] --> D["/friends/add<br/>Handle field"]
-        D -->|Add| V{Valid?}
-        V -->|Empty| E1["Enter a handle,<br/>like @bunkerbill."]
-        V -->|Not found| E2["No one named @x.<br/>Check the spelling or<br/>pick someone below."]
-        V -->|Already friends| E3["You're already<br/>friends with @x."]
-        E1 & E2 & E3 -->|Typed text kept| D
-        V -->|Yes| F["/feed<br/>Toast: Added @x,<br/>N posts in your feed"]
-    end
+## 3 · Writing a post
 
-    subgraph post["Second task: write a post"]
-        F -->|Write a post| P["/post/new<br/>280-character box"]
-        P -->|Post| PV{Valid?}
-        PV -->|Empty| PE1[Write something<br/>before posting.]
-        PV -->|Too long| PE2[Cut N characters<br/>to post.]
-        PE1 & PE2 -->|Typed text kept| P
-        PV -->|Yes| F
-    end
+The second task: write something, and it's at the top of your feed.
 
-    subgraph back["3 · Coming back: it remembers"]
-        R([Open Kinnect<br/>a day later]) --> S{Friends saved?}
-        S -->|No| B
-        S -->|Yes| W["/feed<br/>Welcome back.<br/>N new posts since Sunday"]
-        W --> NEW[New posts, then a<br/>New since your last visit divider]
-        NEW --> OLD[Older posts]
-        OLD --> CU[You're all caught up]
-        S -.->|Nothing new| CU
-    end
+```mermaid
+flowchart TD
+    P["/post/new<br/>280-character box"] -->|Post| V{Valid?}
+    V -->|Empty| E1["Write something<br/>before posting."]
+    V -->|Too long| E2["Cut N characters<br/>to post."]
+    E1 & E2 --> FIX["Fix it and try again<br/>(what you typed is still there)"]
+    FIX --> P
+    V -->|Yes| OK["/feed<br/>Your post on top"]
+```
+
+## 4 · Coming back
+
+Kinnect remembers your friends and when you last visited, so it can show what's new.
+
+```mermaid
+flowchart TD
+    R([Open Kinnect<br/>a day later]) --> S{Friends saved?}
+    S -->|No| W0["/ First visit<br/>People you might know"]
+    S -->|Yes| W["/feed<br/>Welcome back.<br/>N new posts since Sunday"]
+    W --> NEW[New posts]
+    NEW --> DIV[New since your last visit divider]
+    DIV --> OLD[Older posts]
+    OLD --> CU[You're all caught up]
 ```
 
 ## Pages and shared navigation
