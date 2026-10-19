@@ -96,7 +96,7 @@ export default function Feed() {
           <Avatar name={s.name} />
           <span className="flex-1">
             <span className="block font-semibold">What are you up to?</span>
-            <span className="block text-[15px] text-muted">Write your first post. Your friends will see it here.</span>
+            <span className="block text-[15px] text-muted">Write your first post. It goes at the top of your feed.</span>
           </span>
         </Link>
       )}
