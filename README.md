@@ -9,7 +9,13 @@ Kinnect has no accounts or database yet, so it saves to your browser (localStora
 ## Testing it quickly (for graders)
 
 1. **First visit:** open the live link in a private window or a fresh browser. You land on the welcome screen. Tap **+ Add** on a person or two, then **See your feed**.
-2. **The form:** go to **Add**, press **Add friend** with the box empty, then try `@nobody`, then a handle you've already added. Each error sits under the field, and what you typed stays.
+2. **The form:** go to **Add**.
+   - Start typing a name ("ro") and pick from the matches. Picking adds that person right away.
+   - Press **Add friend** with the box empty.
+   - Type `Rosa Delgato` for a "Did you mean…?".
+   - Type someone you've already added.
+
+   Each error sits under the field, and what you typed stays.
 3. **Coming back:** reload the page or open it in a new tab. Every fresh open is a return visit, so the feed says **Welcome back** and what's new since then.
 4. **Fast-forward:** open https://kinnect-chi.vercel.app/?fast, or turn on **Fast-forward time** under **Me**. A sample day then passes every 20 seconds, so friends post every few seconds, and the feed updates while you watch. Reload to see the welcome-back count.
 5. **Start over:** **Me → Reset demo data**.
@@ -105,7 +111,8 @@ The shared components are in `src/components/`:
 
 - **In `ui.tsx`:** `Button`, `ButtonLink`, `TextLink`, `Field`, `Banner`, `Toast`, `PageHeader` and `Avatar`.
 - **In `cards.tsx`:** `PostCard` and `PersonCard`.
-- **`NavBar.tsx`:** the shared navigation.
+- **`NavBar.tsx`:** the shared navigation. On a phone the tabs are a bottom bar; on wider screens they sit in the top bar.
+- **`TypeAhead.tsx`:** the type-ahead list on the add-friend field.
 - **`Session.tsx`:** starts the visit clock and shows the fast-forward bar.
 
 Every page is built from these.
@@ -181,7 +188,21 @@ Its goal: **"Add three friends and post what you're up to this week."** After th
 
 ### What I changed
 
-_In progress._
+I chose which problems to fix. Each fix is its own commit:
+
+| Problem | Fix |
+|---|---|
+| 9. Keyboard | On a phone, the bottom tabs now come last in the page, so Tab order matches the screen. Changing pages moves focus to the new page's heading. The post box is focused when it opens. |
+| 7. Toasts cover headings | Toasts now sit just above the tab bar. They can also carry a button (used for Undo). |
+| 3, 4. Adding takes extra steps | Picking a type-ahead match adds that person. The form stays on the page, clears and keeps focus, and shows a running "✓ Added Rosa Delgado, Gus Petrakis" line with **See your feed**. |
+| 5. No help with typos | A near miss says "Did you mean Rosa Delgado?" and offers a **Yes, add Rosa Delgado** button. |
+| 2. Remove has no undo | The "Removed Gus Petrakis." toast has **Undo**, which puts Gus back in the same spot. |
+| 1. Drafts are lost | What you write is saved on the device as you type. The feed shows **Finish your draft**, and posting clears it. |
+| 6. Friends feel scheduled | I removed "Next up: Rosa, around 5 PM". I kept "Welcome back" on every return, because I want the return to feel instant. |
+
+**Not changed, on purpose:**
+- **Friends reacting to your posts (8).** This would make coming back stronger, but it adds a lot of complexity. It fits better next week, once there are real accounts.
+- **Fast-forward staying on across visits.** It's a testing tool, and keeping it on is what lets a grader reload and see new posts.
 
 ## How I worked with the agent
 
@@ -195,5 +216,8 @@ I built this step by step with Claude Code, with a commit per step (see the hist
    - avatars, because the app "looked too dead";
    - a bookish restyle, away from the Swiss look;
    - a welcome-back message on every return, not only after 30 minutes;
-   - fast-forward, so a grader can see new posts arrive.
+   - fast-forward, so a grader can see new posts arrive;
+   - type-ahead on the Add tab;
+   - a default avatar for me, wearing the pixel "deal with it" sunglasses.
 5. **Bugs.** I noticed the feed turning dark after visiting a missing page. The agent traced it to Next's built-in 404 styles staying mounted and fixed it.
+6. **First-run check.** A subagent tested the live site as a new user. I picked seven of its fixes. I started on friend reactions, then dropped them as more complexity than this week needs.
