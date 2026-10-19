@@ -27,7 +27,18 @@ Kinnect has no sign-up, so it already skips the slowest part of all three. The l
 
 ## Decided for Kinnect's first visit
 
-_To be filled in after review._
+**Kept**
+- **Posts before anything** (from Threads). The welcome screen shows a few live sample posts, so you can see what Kinnect is before adding anyone.
+- **One-tap Add plus "Add all"** (from Bluesky starter packs and Threads' Follow all).
+- **A one-line bio next to every Add button** (from Mastodon).
+- **Chronological only.** Only the friends you chose, newest first, with no algorithm.
+- **A first-post prompt.** An inline "What are you up to?" sits in the feed until you've posted once. After that, your post appears on top with a confirmation.
+- **No required profile step.** Your name defaults to "You" and can be changed on `/me`.
+
+**Left out**
+- **Pre-adding friends.** You add your own, so the first visit is learning by doing.
+- **Suggestions in the feed.** The feed stays your friends only. If you remove everyone, the empty state still points you to suggestions, so the feed is never a dead end.
+- **Interest chips.** With seven people they're an extra step with no payoff.
 
 ## Sources
 - Bluesky: https://bsky.social/ · https://bsky.social/about/blog/06-26-2024-starter-packs · https://www.howtogeek.com/how-to-get-started-on-bluesky-a-guide-for-beginners/ · https://techcrunch.com/2025/04/10/blueskys-latest-update-adds-chat-reactions-and-an-explore-page-similar-to-x
