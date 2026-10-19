@@ -81,7 +81,11 @@ flowchart LR
 | State | Where | What the person sees |
 |---|---|---|
 | First visit | `/` | A one-line pitch and suggested people with **+ Add**. Never an empty feed. |
-| Just added | `/feed` | A toast: "Added @x: N posts in your feed." |
+| Just added | `/`, `/friends/add` | A toast ("Added Rosa Delgado. 2 posts in your feed.") and a **See your feed** button. You stay put to add more. |
+| Did you mean | `/friends/add` | A near-miss name offers "Yes, add Rosa Delgado". |
+| Draft saved | `/post/new`, `/feed` | Half-written posts are kept. The feed shows **Finish your draft**. |
+| Just removed | `/friends` | A toast with **Undo**. |
+| Fast-forward on | every page | A bar says a day passes every 20 seconds, with **Turn off**. |
 | New since last visit | `/feed` | A welcome-back banner with a count, and a divider after the new posts. |
 | Caught up | `/feed` | "You're all caught up" at the end of the feed. |
 | No friends left | `/feed` | A prompt to add someone, with suggestions (not a blank page). |
