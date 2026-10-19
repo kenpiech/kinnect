@@ -175,42 +175,18 @@ people = {
 }
 
 
-def pixel_shades(x0=25, y0=50, cell=3.5):
-    """The pixelated "deal with it" sunglasses, built cell by cell. They drop
-    into place in steps when the image loads (not under reduce-motion)."""
-    rows = [
-        "XXXXXXXXXXXXXXXXXXXX",
-        "..XWWXXXX..XWWXXXX..",
-        "..XXWWXXX..XXWWXXX..",
-        "...XXXXX....XXXXX...",
-    ]
-    cells = []
-    for r, row in enumerate(rows):
-        for c, ch in enumerate(row):
-            if ch == ".":
-                continue
-            fill = "#f3eddf" if ch == "W" else "#111"
-            cells.append(f'<rect x="{x0 + c * cell}" y="{y0 + r * cell}" width="{cell + 0.3}" height="{cell + 0.3}" fill="{fill}"/>')
-    return f'<g class="shades" shape-rendering="crispEdges">{"".join(cells)}</g>'
 
-
-# You: a friendly default with the meme's pixel sunglasses
+# You: a friendly default for your own posts
 people["me"] = svg(
     "you",
     bg="#efe0b0",
     skin="#e3ae86",
     shirt="#2f6f73",
-    blink_delay=0,
+    blink_delay=0.8,
     neck_extra=f'<path d="M48 87 q12 8 24 0" fill="none" stroke="{INK}" stroke-width="2.2"/>',
-    eyes_extra=brows(46, w=2.8),
+    eyes_extra=brows(49, w=2.8),
     mouth=f'<path d="M53 70 q8 5 15 -2" fill="none" stroke="{INK}" stroke-width="2.4" stroke-linecap="round"/>',
-    front=f'<path d="M37 52 C34 30 52 26 62 30 C72 26 88 32 83 52 C80 42 74 38 66 40 C58 36 46 40 37 52 Z" fill="#4a3426" stroke="{INK}" stroke-width="2.5"/>'
-    + pixel_shades(),
-).replace(
-    "@media (prefers-reduced-motion:reduce){.eyes{animation:none}}",
-    ".shades{animation:drop 1.2s steps(6,end) .3s both}"
-    "@keyframes drop{from{transform:translateY(-60px)}to{transform:translateY(0)}}"
-    "@media (prefers-reduced-motion:reduce){.eyes,.shades{animation:none}}",
+    front=f'<path d="M37 52 C34 30 52 26 62 30 C72 26 88 32 83 52 C80 42 74 38 66 40 C58 36 46 40 37 52 Z" fill="#4a3426" stroke="{INK}" stroke-width="2.5"/>',
 )
 
 OUT.mkdir(parents=True, exist_ok=True)

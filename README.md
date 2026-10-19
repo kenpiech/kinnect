@@ -218,6 +218,6 @@ I built this step by step with Claude Code, with a commit per step (see the hist
    - a welcome-back message on every return, not only after 30 minutes;
    - fast-forward, so a grader can see new posts arrive;
    - type-ahead on the Add tab;
-   - a default avatar for me, wearing the pixel "deal with it" sunglasses.
+   - a default avatar for me.
 5. **Bugs.** I noticed the feed turning dark after visiting a missing page. The agent traced it to Next's built-in 404 styles staying mounted and fixed it.
 6. **First-run check.** A subagent tested the live site as a new user. I picked seven of its fixes. I started on friend reactions, then dropped them as more complexity than this week needs.

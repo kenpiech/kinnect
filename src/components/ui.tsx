@@ -197,7 +197,7 @@ export function PageHeader({ title, children }: { title: string; children?: Reac
 }
 
 // A cartoon portrait (public/avatars, drawn by scripts/avatars.py): one for
-// each sample friend, and "me" for you, in pixel sunglasses.
+// each sample friend, and "me" for you.
 export function Avatar({ name, handle, size = "md" }: { name: string; handle?: string; size?: "md" | "lg" }) {
   const box = size === "lg" ? "size-16" : "size-12";
   if (handle) {
