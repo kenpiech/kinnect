@@ -292,8 +292,18 @@ export function addAllFriends(handles: string[]) {
   return toAdd.length;
 }
 
+// Returns where they were in your list, so Undo can put them back there.
 export function removeFriend(handle: string) {
+  const index = state.friends.indexOf(handle);
   save({ ...state, friends: state.friends.filter((h) => h !== handle) });
+  return index;
+}
+
+export function restoreFriend(handle: string, index: number) {
+  if (state.friends.includes(handle)) return;
+  const friends = [...state.friends];
+  friends.splice(Math.max(0, index), 0, handle);
+  save({ ...state, friends });
 }
 
 export const MAX_POST = 280;

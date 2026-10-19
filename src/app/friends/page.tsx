@@ -3,10 +3,10 @@
 import { PersonCard } from "@/components/cards";
 import { Button, ButtonLink, PageHeader, Toast, plural, useToast } from "@/components/ui";
 import { personByHandle } from "@/data/people";
-import { removeFriend, useStore } from "@/lib/store";
+import { removeFriend, restoreFriend, useStore } from "@/lib/store";
 
-// Who you've added, newest first, with Remove. Never a dead end: with no
-// friends it points you to Add.
+// Who you've added, newest first, with Remove (and Undo in the toast). Never
+// a dead end: with no friends it points you to Add.
 export default function Friends() {
   const s = useStore();
   const [toast, setToast] = useToast();
@@ -33,8 +33,14 @@ export default function Friends() {
                   className="px-4"
                   aria-label={`Remove ${person.name}`}
                   onClick={() => {
-                    removeFriend(person.handle);
-                    setToast(`Removed ${person.name}. Their posts are gone from your feed.`);
+                    const index = removeFriend(person.handle);
+                    setToast(`Removed ${person.name}.`, {
+                      label: "Undo",
+                      onClick: () => {
+                        restoreFriend(person.handle, index);
+                        setToast(`${person.name} is back in your feed.`);
+                      },
+                    });
                   }}
                 >
                   Remove
