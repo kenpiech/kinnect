@@ -22,7 +22,7 @@ What brings them back is **new posts from their friends**. The sample friends po
 
 - "Welcome back. 4 new posts from 3 friends since Saturday."
 - A divider in the feed: "↑ New since your last visit".
-- When nothing is new, it says who's next: "Nothing new since your last visit. Next up: Rosa, around 4 PM."
+- When nothing is new, it says so plainly: "Nothing new since your last visit."
 
 ## Flows
 
@@ -55,7 +55,7 @@ flowchart TD
     R([Open Kinnect again<br/>new tab, reopen or reload]) --> S{Friends saved?}
     S -->|No| W0["/ First visit<br/>People you might know"]
     S -->|Yes| W["/feed<br/>Welcome back.<br/>N new posts since Sunday"]
-    W -->|Nothing new| NX[Next up: Rosa,<br/>around 6 PM]
+    W -->|Nothing new| NX[Nothing new since<br/>your last visit]
     W --> NEW[New posts]
     NEW --> DIV[New since your last visit divider]
     DIV --> OLD[Older posts]

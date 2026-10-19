@@ -209,30 +209,6 @@ export function sinceWhen(at: number, now: number) {
   return new Date(at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-// The next sample post due from one of your friends, so a quiet feed can say
-// when to come back.
-export function nextFriendPost(s: State, now = sampleNow(s)) {
-  if (s.firstVisit === null) return null;
-  const friends = new Set(s.friends);
-  let next: { author: string; at: number } | null = null;
-  for (const p of seedPosts) {
-    if (!friends.has(p.author)) continue;
-    const at = visibleAt(p, s.firstVisit);
-    if (at > now && (!next || at < next.at)) next = { author: p.author, at };
-  }
-  return next;
-}
-
-// "around 6 PM", "tomorrow around 9 AM", "Thursday around 7 PM"
-export function aroundWhen(at: number, now: number) {
-  const day = (t: number) => new Date(t).setHours(0, 0, 0, 0);
-  const days = Math.round((day(at) - day(now)) / DAY);
-  const time = new Date(at).toLocaleTimeString("en-US", { hour: "numeric" });
-  if (days === 0) return `around ${time}`;
-  if (days === 1) return `tomorrow around ${time}`;
-  return `${new Date(at).toLocaleDateString("en-US", { weekday: "long" })} around ${time}`;
-}
-
 export function normalizeHandle(input: string) {
   return input.trim().replace(/^@/, "").replace(/\s+/g, " ").toLowerCase();
 }

@@ -7,10 +7,8 @@ import { Avatar, Banner, PageHeader, TextLink, Toast, plural, useToast } from "@
 import { people, personByHandle } from "@/data/people";
 import {
   addFriend,
-  aroundWhen,
   feed,
   newSinceLastVisit,
-  nextFriendPost,
   sessionStartedAt,
   sinceWhen,
   takeFlash,
@@ -39,7 +37,6 @@ export default function Feed() {
   const hasPosted = s.myPosts.length > 0;
   const fresh = newSinceLastVisit(s, now);
   const freshFrom = new Set(fresh.map((p) => p.author)).size;
-  const next = nextFriendPost(s, now);
   const arrivedAfter = sessionStartedAt() ?? now;
 
   // Invites a first post, or brings back an unfinished draft
@@ -107,9 +104,6 @@ export default function Feed() {
           {fresh.length > 0
             ? `${plural(fresh.length, "new post")} from ${plural(freshFrom, "friend")} since ${sinceWhen(s.previousVisit, now)}.`
             : `Nothing new since ${sinceWhen(s.previousVisit, now)}.`}
-          {fresh.length === 0 && next && (
-            <> Next up: {personByHandle.get(next.author)!.name.split(" ")[0]}, {aroundWhen(next.at, now)}.</>
-          )}
         </Banner>
       )}
 
