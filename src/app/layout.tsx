@@ -6,7 +6,7 @@ import "./globals.css";
 
 const literata = Literata({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-literata" });
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#f3eddf" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#f3eddf", colorScheme: "light" };
 
 export const metadata: Metadata = {
   title: "Kinnect",

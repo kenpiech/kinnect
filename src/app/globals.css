@@ -26,7 +26,16 @@
   --font-sans: var(--font-literata);
 }
 
-body {
+/*
+  Always light, like paper, even when the device is in dark mode. "html body"
+  outranks any page-level body style (Next's built-in 404 page ships a dark
+  one, and Next keeps visited pages mounted, so it used to leak into the feed).
+*/
+:root {
+  color-scheme: light;
+}
+
+html body {
   background: var(--color-paper);
   color: var(--color-ink);
   font-size: 17px;
