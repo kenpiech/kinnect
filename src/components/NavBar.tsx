@@ -52,7 +52,11 @@ export function NavBar() {
             })}
           </ul>
         </nav>
-        <ButtonLink href="/post/new" className="px-4">
+        <ButtonLink
+          href="/post/new"
+          aria-current={pathname === "/post/new" ? "page" : undefined}
+          className="px-4 aria-[current=page]:ring-2 aria-[current=page]:ring-ink aria-[current=page]:ring-offset-2 aria-[current=page]:ring-offset-paper"
+        >
           Write
         </ButtonLink>
       </div>
