@@ -47,6 +47,7 @@ export default function NewPost() {
             if (error) setError(undefined);
           }}
           placeholder="Ran my first 5K. Legs are jelly."
+          autoFocus
           aside={
             <span aria-live="polite" className={`text-[14px] ${left < 0 ? "font-semibold text-danger" : "text-muted"}`}>
               {left < 0 ? `${-left} over` : `${left} left`}

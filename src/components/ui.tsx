@@ -161,7 +161,9 @@ export function plural(n: number, word: string) {
 export function PageHeader({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
     <header className="grid gap-1">
-      <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
+      <h1 tabIndex={-1} className="text-3xl font-semibold tracking-tight outline-offset-4 sm:text-4xl">
+        {title}
+      </h1>
       {children && <div className="text-muted">{children}</div>}
     </header>
   );

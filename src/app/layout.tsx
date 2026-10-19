@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Literata } from "next/font/google";
-import { NavBar } from "@/components/NavBar";
+import { NavBar, RouteFocus, TabBar } from "@/components/NavBar";
 import { Session } from "@/components/Session";
 import "./globals.css";
 
@@ -27,6 +27,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             Sample friends · saved on this device
           </p>
         </footer>
+        <TabBar />
+        <RouteFocus />
       </body>
     </html>
   );

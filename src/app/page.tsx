@@ -45,7 +45,7 @@ export default function Welcome() {
   return (
     <div className="grid gap-8">
       <section className="grid gap-2">
-        <h1 className="text-[2rem] font-semibold leading-tight tracking-tight sm:text-5xl">
+        <h1 tabIndex={-1} className="text-[2rem] font-semibold leading-tight tracking-tight outline-offset-4 sm:text-5xl">
           See what your friends are up to.
         </h1>
         <p className="text-muted sm:text-lg">
