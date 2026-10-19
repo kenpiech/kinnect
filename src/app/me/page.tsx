@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PostCard } from "@/components/cards";
-import { Button, Field, PageHeader, TextLink, Toast, useToast } from "@/components/ui";
+import { Avatar, Button, Field, PageHeader, TextLink, Toast, useToast } from "@/components/ui";
 import { FAST_SPEED, resetAll, setName, setSpeed, useNow, useStore } from "@/lib/store";
 
 // You: your name, your posts, fast-forward for testing, and a way to start over.
@@ -34,7 +34,10 @@ export default function Me() {
 
   return (
     <div className="grid gap-10">
-      <PageHeader title={s.name === "You" ? "Me" : s.name}>Everything here is saved on this device.</PageHeader>
+      <div className="flex items-center gap-4">
+        <Avatar name={s.name} handle="me" size="lg" />
+        <PageHeader title={s.name === "You" ? "Me" : s.name}>Everything here is saved on this device.</PageHeader>
+      </div>
 
       <form onSubmit={saveName} noValidate className="grid gap-4">
         <Field

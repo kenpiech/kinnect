@@ -93,7 +93,7 @@ export default function Feed() {
           href="/post/new"
           className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-4 hover:bg-hover"
         >
-          <Avatar name={s.name} />
+          <Avatar name={s.name} handle="me" />
           <span className="flex-1">
             <span className="block font-semibold">What are you up to?</span>
             <span className="block text-[15px] text-muted">Write your first post. It goes at the top of your feed.</span>

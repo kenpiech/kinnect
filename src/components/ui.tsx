@@ -167,8 +167,8 @@ export function PageHeader({ title, children }: { title: string; children?: Reac
   );
 }
 
-// A cartoon portrait for the sample friends (public/avatars, drawn by
-// scripts/avatars.py), or your initials for you.
+// A cartoon portrait (public/avatars, drawn by scripts/avatars.py): one for
+// each sample friend, and "me" for you, in pixel sunglasses.
 export function Avatar({ name, handle, size = "md" }: { name: string; handle?: string; size?: "md" | "lg" }) {
   const box = size === "lg" ? "size-16" : "size-12";
   if (handle) {

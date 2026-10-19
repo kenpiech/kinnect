@@ -37,7 +37,7 @@ export function PostCard({
     <article
       className={`flex gap-3 border-b border-rule py-5 ${arrived ? "animate-[arrive_.6s_ease-out] motion-reduce:animate-none" : ""}`}
     >
-      <Avatar name={name} handle={mine ? undefined : post.author} />
+      <Avatar name={name} handle={mine ? "me" : post.author} />
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-baseline gap-x-2 text-[15px] leading-snug">
           <span className="font-semibold text-[17px]">{name}</span>
