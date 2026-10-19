@@ -234,7 +234,34 @@ export function normalizeHandle(input: string) {
   return input.trim().replace(/^@/, "").replace(/\s+/g, " ").toLowerCase();
 }
 
-export type AddResult = { ok: true; handle: string; postCount: number } | { ok: false; error: string };
+export type AddResult =
+  | { ok: true; handle: string; postCount: number }
+  | { ok: false; error: string; suggestion?: string };
+
+// How many single-letter edits turn a into b.
+function editDistance(a: string, b: string) {
+  let row = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const next = [i];
+    for (let j = 1; j <= b.length; j++) {
+      next[j] = Math.min(row[j] + 1, next[j - 1] + 1, row[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    row = next;
+  }
+  return row[b.length];
+}
+
+// The person whose handle or name is a near miss for what was typed, if any.
+function closestPerson(typed: string) {
+  let best: { handle: string; d: number } | null = null;
+  for (const p of people) {
+    for (const candidate of [p.handle, p.name.toLowerCase()]) {
+      const d = editDistance(typed, candidate);
+      if (d <= Math.max(2, Math.floor(candidate.length * 0.3)) && (!best || d < best.d)) best = { handle: p.handle, d };
+    }
+  }
+  return best?.handle;
+}
 
 // Checks a typed handle (or full name) and adds that person. The error
 // messages say what to do next.
@@ -243,6 +270,12 @@ export function addFriend(input: string): AddResult {
   if (!typed) return { ok: false, error: "Enter a name or handle, like @bunkerbill." };
   const person = personByHandle.get(typed) ?? people.find((p) => p.name.toLowerCase() === typed);
   if (!person) {
+    const suggestion = closestPerson(typed);
+    if (suggestion) {
+      const name = personByHandle.get(suggestion)!.name;
+      const meant = input.trim().startsWith("@") ? `@${suggestion} (${name})` : name;
+      return { ok: false, error: `No one named “${input.trim()}”. Did you mean ${meant}?`, suggestion };
+    }
     return { ok: false, error: `No one named “${input.trim()}”. Check the spelling or pick someone below.` };
   }
   const handle = person.handle;

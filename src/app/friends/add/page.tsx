@@ -24,15 +24,19 @@ export default function AddFriend() {
   const showList = matches.length > 0;
   // Who you've added on this page, so you can see your progress
   const [addedHere, setAddedHere] = useState<string[]>([]);
+  // A near miss ("Rosa Delgato") offers the person it probably meant
+  const [suggestion, setSuggestion] = useState<string | undefined>();
 
   // Every way of adding (the form, a type-ahead pick, a suggestion) ends here
   function add(typed: string, fromField: boolean) {
     setOpen(false);
     setActive(-1);
     const result = addFriend(typed);
+    setSuggestion(undefined);
     if (!result.ok) {
       if (fromField) {
         setError(result.error);
+        setSuggestion(result.suggestion);
         input.current?.focus();
       }
       return;
@@ -95,6 +99,7 @@ export default function AddFriend() {
             setOpen(true);
             setActive(-1);
             if (error) setError(undefined);
+            setSuggestion(undefined);
           }}
           onKeyDown={onKeyDown}
           onBlur={() => setOpen(false)}
@@ -120,6 +125,11 @@ export default function AddFriend() {
           spellCheck={false}
           enterKeyHint="done"
         />
+        {suggestion && (
+          <Button variant="secondary" className="justify-self-start" onClick={() => add(suggestion, true)}>
+            Yes, add {personByHandle.get(suggestion)!.name}
+          </Button>
+        )}
         <Button type="submit" className="w-full sm:w-auto sm:justify-self-start">
           Add friend
         </Button>
