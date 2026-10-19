@@ -131,7 +131,7 @@ export function Banner({
 // polite live region so screen readers announce it without moving focus.
 export function Toast({ message }: { message: string | null }) {
   return (
-    <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-6 flex justify-center px-4">
+    <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-20 z-30 sm:bottom-6 flex justify-center px-4">
       {message && <p className="bg-ink px-5 py-3 text-sm font-semibold text-paper">{message}</p>}
     </div>
   );
