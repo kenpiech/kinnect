@@ -44,7 +44,7 @@ export default function Welcome() {
   return (
     <div className="grid gap-8">
       <section className="grid gap-2">
-        <h1 className="text-[2rem] font-bold leading-none tracking-tight sm:text-6xl">
+        <h1 className="text-[2rem] font-semibold leading-tight tracking-tight sm:text-5xl">
           See what your friends are up to.
         </h1>
         <p className="text-muted sm:text-lg">
@@ -53,7 +53,7 @@ export default function Welcome() {
       </section>
 
       <section aria-labelledby="now" className="grid gap-1">
-        <h2 id="now" className="label border-b border-ink pb-2">
+        <h2 id="now" className="label border-b border-rule pb-2 text-muted">
           On Kinnect right now
         </h2>
         {preview.map((post) => (
@@ -62,12 +62,12 @@ export default function Welcome() {
       </section>
 
       <section aria-labelledby="people" className="grid gap-1">
-        <div className="flex items-end justify-between gap-4 border-b border-ink pb-2">
+        <div className="flex items-end justify-between gap-4 border-b border-rule pb-3">
           <div>
-            <h2 id="people" className="text-2xl font-bold tracking-tight">
+            <h2 id="people" className="text-2xl font-semibold tracking-tight">
               People you might know
             </h2>
-            <p className="text-sm text-muted">Tap Add, and their posts are in your feed.</p>
+            <p className="text-[15px] text-muted">Tap Add, and their posts are in your feed.</p>
           </div>
           {notAdded.length > 1 && (
             <Button variant="quiet" onClick={addAll}>
@@ -82,8 +82,8 @@ export default function Welcome() {
             return (
               <PersonCard key={person.handle} person={person} added={added} onAdd={() => add(person.handle)}>
                 {newest && (
-                  <div className="mb-3 border-l-4 border-accent pl-3 [&>article]:border-b-0 [&>article]:py-1">
-                    <p className="label text-muted">Their newest post</p>
+                  <div className="mb-4 rounded-2xl bg-surface px-4 pt-3 [&>article]:border-b-0 [&>article]:pt-1 [&>article]:pb-3">
+                    <p className="text-[14px] italic text-muted">Their newest post</p>
                     <PostCard post={newest} myName={s.name} />
                   </div>
                 )}
@@ -95,7 +95,7 @@ export default function Welcome() {
 
       {s.friends.length > 0 && (
         <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] sm:bottom-4">
-          <ButtonLink href="/feed" className="w-full">
+          <ButtonLink href="/feed" className="w-full shadow-lg">
             See your feed · {plural(feedCount, "post")} →
           </ButtonLink>
         </div>

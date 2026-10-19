@@ -10,12 +10,12 @@ import { forwardRef, useCallback, useEffect, useId, useState } from "react";
 type Variant = "primary" | "secondary" | "quiet";
 
 const buttonBase =
-  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-5 label text-[13px]! cursor-pointer transition-colors border disabled:cursor-not-allowed disabled:bg-disabled disabled:text-disabled-ink disabled:border-disabled";
+  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-[15px] font-semibold cursor-pointer transition-colors border disabled:cursor-not-allowed disabled:bg-disabled disabled:text-disabled-ink disabled:border-disabled";
 
 const buttonVariants: Record<Variant, string> = {
-  primary: "bg-accent text-white border-accent hover:bg-accent-hover hover:border-accent-hover active:bg-accent-pressed",
-  secondary: "bg-surface text-ink border-ink hover:bg-hover active:bg-hover",
-  quiet: "bg-transparent text-ink border-transparent underline underline-offset-4 hover:decoration-2 px-2",
+  primary: "bg-accent text-paper border-accent hover:bg-accent-hover hover:border-accent-hover active:bg-accent-pressed",
+  secondary: "bg-surface text-ink border-line hover:bg-hover active:bg-hover",
+  quiet: "bg-transparent text-ink border-transparent underline decoration-line underline-offset-4 hover:decoration-ink px-2",
 };
 
 export function Button({
@@ -61,8 +61,8 @@ export const Field = forwardRef<
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   const describedBy = [errorId, hintId].filter(Boolean).join(" ") || undefined;
-  const control = `w-full bg-surface text-ink border px-3 text-base placeholder:text-muted hover:bg-hover focus-visible:bg-surface ${
-    error ? "border-danger border-2" : "border-ink"
+  const control = `w-full rounded-xl bg-surface text-ink border px-4 text-[17px] placeholder:text-muted hover:bg-hover focus-visible:bg-surface ${
+    error ? "border-danger border-2" : "border-line"
   } ${className}`;
 
   return (
@@ -79,7 +79,7 @@ export const Field = forwardRef<
           id={id}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          className={`${control} min-h-32 py-2.5 leading-normal`}
+          className={`${control} min-h-36 py-3 leading-relaxed`}
           {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
         />
       ) : (
@@ -93,13 +93,13 @@ export const Field = forwardRef<
         />
       )}
       {error && (
-        <p id={errorId} className="flex gap-1.5 text-sm font-semibold text-danger">
-          <span aria-hidden="true">!</span>
+        <p id={errorId} className="flex items-start gap-2 text-[15px] font-semibold text-danger">
+          <span aria-hidden="true" className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-danger text-xs text-paper">!</span>
           {error}
         </p>
       )}
       {hint && (
-        <p id={hintId} className="text-sm text-muted">
+        <p id={hintId} className="text-[15px] text-muted">
           {hint}
         </p>
       )}
@@ -120,7 +120,7 @@ export function Banner({
   return (
     <section
       aria-label={title}
-      className={`border p-4 ${tone === "accent" ? "border-accent border-l-8" : "border-ink"} bg-surface`}
+      className={`rounded-2xl border p-4 ${tone === "accent" ? "border-accent/40 border-l-4 border-l-accent" : "border-rule"} bg-surface`}
     >
       <p className="font-bold">{title}</p>
       {children && <div className="mt-1 text-muted">{children}</div>}
@@ -134,7 +134,7 @@ export function Banner({
 export function Toast({ message }: { message: string | null }) {
   return (
     <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 top-16 z-30 flex justify-center px-4">
-      {message && <p className="bg-ink px-5 py-3 text-sm font-semibold text-paper">{message}</p>}
+      {message && <p className="rounded-full bg-ink px-5 py-2.5 text-[15px] text-paper shadow-lg">{message}</p>}
     </div>
   );
 }
@@ -157,8 +157,8 @@ export function plural(n: number, word: string) {
 
 export function PageHeader({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
-    <header className="grid gap-2 border-b border-ink pb-4">
-      <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
+    <header className="grid gap-1">
+      <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
       {children && <div className="text-muted">{children}</div>}
     </header>
   );

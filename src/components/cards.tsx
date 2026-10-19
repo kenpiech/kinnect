@@ -23,15 +23,15 @@ export function PostCard({ post, myName }: { post: FeedPost; myName: string }) {
   const name = mine ? myName : (person?.name ?? post.author);
 
   return (
-    <article className="flex gap-3 border-b border-ink py-4">
+    <article className="flex gap-3 border-b border-rule py-5">
       <Avatar name={name} handle={mine ? undefined : post.author} />
       <div className="min-w-0 flex-1">
-        <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
-          <span className="font-bold text-base">{name}</span>
+        <p className="flex flex-wrap items-baseline gap-x-2 text-[15px] leading-snug">
+          <span className="font-semibold text-[17px]">{name}</span>
           {!mine && <span className="text-muted">@{post.author}</span>}
           <span className="text-muted">· {timeAgo(post.at)}</span>
         </p>
-        <p className="mt-1 whitespace-pre-wrap break-words">{post.text}</p>
+        <p className="mt-1.5 whitespace-pre-wrap break-words text-[18px] leading-relaxed">{post.text}</p>
       </div>
     </article>
   );
@@ -54,18 +54,18 @@ export function PersonCard({
   children?: React.ReactNode;
 }) {
   return (
-    <li className="border-b border-ink">
+    <li className="border-b border-rule">
       <div className="flex items-center gap-3 py-3">
       <Avatar name={person.name} handle={person.handle} />
       <div className="min-w-0 flex-1">
-        <p className="font-bold">
+        <p className="font-semibold leading-snug">
           {person.name} <span className="font-normal text-muted">@{person.handle}</span>
         </p>
-        <p className="text-sm text-muted">{person.bio}</p>
+        <p className="text-[15px] leading-snug text-muted">{person.bio}</p>
       </div>
       {action ??
         (added ? (
-          <span className="label px-3 text-success">✓ Added</span>
+          <span className="px-3 text-[15px] font-semibold text-success">✓ Added</span>
         ) : (
           <Button variant="secondary" className="min-h-11 px-4" onClick={onAdd} aria-label={`Add ${person.name}`}>
             + Add
