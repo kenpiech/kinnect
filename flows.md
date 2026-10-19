@@ -23,13 +23,13 @@ Every error sits under the field, says what to do next, and keeps what you typed
 
 ```mermaid
 flowchart TD
-    A["/friends/add<br/>Name or handle,<br/>matches as you type"] -->|Add friend| V{Valid?}
+    A["/friends/add<br/>Name or handle,<br/>matches as you type"] -->|Add friend or pick a match| V{Valid?}
     V -->|Empty| E1["Enter a name or handle,<br/>like @bunkerbill."]
     V -->|Not found| E2["No one named “x”.<br/>Check the spelling or<br/>pick someone below."]
     V -->|Already friends| E3["You're already<br/>friends with Rosa."]
     E1 & E2 & E3 --> FIX["Fix it and try again<br/>(what you typed is still there)"]
     FIX --> A
-    V -->|Yes| OK["/feed<br/>Toast: Added @x,<br/>N posts in your feed"]
+    V -->|Yes| OK["Added ✓, still on the form<br/>add another, or<br/>See your feed →"]
 ```
 
 ## 3 · Writing a post
