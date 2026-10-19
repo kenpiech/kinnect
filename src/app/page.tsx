@@ -102,7 +102,7 @@ export default function Welcome() {
         </div>
       )}
 
-      <Toast message={toast} />
+      <Toast message={toast} raised={s.friends.length > 0} />
     </div>
   );
 }

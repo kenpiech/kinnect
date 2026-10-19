@@ -131,27 +131,54 @@ export function Banner({
   );
 }
 
-// A short confirmation after an action ("Added Rosa"). It sits just under the
-// top bar, clear of the bottom tabs, in a polite live region so screen
-// readers announce it without moving focus. It fades after a few seconds.
-export function Toast({ message }: { message: string | null }) {
+// A short confirmation after an action ("Added Rosa"), with an optional
+// action like Undo. It sits just above the bottom tabs (or the bottom of the
+// screen on wider ones), away from the page heading, in a polite live region
+// so screen readers announce it without moving focus. It fades after a few
+// seconds; a toast with an action stays a little longer.
+export type ToastMessage = { text: string; action?: { label: string; onClick: () => void } };
+
+export function Toast({ message, raised }: { message: ToastMessage | null; raised?: boolean }) {
   return (
-    <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 top-16 z-30 flex justify-center px-4">
-      {message && <p className="rounded-full bg-ink px-5 py-2.5 text-[15px] text-paper shadow-lg">{message}</p>}
+    <div
+      role="status"
+      aria-live="polite"
+      className={`pointer-events-none fixed inset-x-0 z-30 flex justify-center px-4 ${
+        raised ? "bottom-[calc(8rem+env(safe-area-inset-bottom))]" : "bottom-[calc(4.5rem+env(safe-area-inset-bottom))]"
+      } sm:bottom-6`}
+    >
+      {message && (
+        <p className="pointer-events-auto flex items-center gap-4 rounded-full bg-ink py-2.5 pr-3 pl-5 text-[15px] text-paper shadow-lg">
+          {message.text}
+          {message.action && (
+            <button
+              type="button"
+              onClick={message.action.onClick}
+              className="min-h-8 cursor-pointer rounded-full px-3 font-semibold underline underline-offset-4 hover:bg-paper/15"
+            >
+              {message.action.label}
+            </button>
+          )}
+        </p>
+      )}
     </div>
   );
 }
 
-export function useToast(ms = 4000) {
-  const [message, setMessage] = useState<string | null>(null);
+export function useToast() {
+  const [message, setMessage] = useState<ToastMessage | null>(null);
   useEffect(() => {
     if (!message) return;
-    const t = setTimeout(() => setMessage(null), ms);
+    const t = setTimeout(() => setMessage(null), message.action ? 7000 : 4000);
     return () => clearTimeout(t);
-  }, [message, ms]);
+  }, [message]);
   // A new object each time, so the same message twice still shows
-  const show = useCallback((m: string) => setMessage(m), []);
-  return [message, show] as const;
+  const show = useCallback(
+    (text: string, action?: ToastMessage["action"]) => setMessage({ text, action }),
+    [],
+  );
+  const hide = useCallback(() => setMessage(null), []);
+  return [message, show, hide] as const;
 }
 
 export function plural(n: number, word: string) {
