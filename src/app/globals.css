@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/*
+  Swiss tokens, carried over from the Assignment 2 design system
+  (portfolio/src/design/themes.ts). Inter Tight, off-white paper, black
+  ink, one red. Square corners and 1px black rules instead of shadows.
+*/
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-paper: #f4f4f1;
+  --color-surface: #ffffff;
+  --color-ink: #111111;
+  --color-muted: #5c5c58;
+  --color-hover: #e9e9e5;
+  --color-accent: #e30613;
+  --color-accent-hover: #c70511;
+  --color-accent-pressed: #a3040e;
+  /* #e30613 is 4.4:1 on paper, so error text uses the darker red (5.5:1) */
+  --color-danger: #c70511;
+  --color-success: #0b6b3a;
+  --color-disabled: #e4e4e0;
+  --color-disabled-ink: #8a8a85;
+  --font-sans: var(--font-inter-tight);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/* One focus ring for every control */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* Small caps-style label, used for field labels, nav and meta lines */
+@utility label {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
