@@ -7,3 +7,17 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+# Kinnect
+
+A text-only social app: add people as friends and read what they post. Spelled with two n's.
+
+## Product facts
+- **No backend.** There's no database, no accounts and no external APIs. All data lives in the browser's localStorage.
+- **Simulated network.** The friends are seeded sample people (`src/data/people.ts`). Each post has a `dayOffset` and an `hour`, and it goes live at `firstVisit + dayOffset days + hour`, so coming back on a later day shows new posts. The UI says these are sample friends saved on this device.
+- **One storage module.** Only `src/lib/store.ts` touches localStorage, under one versioned key (`kinnect:v1`). Keep it that way, so a real database can replace it later.
+- **Text only.** No images for now.
+- **Style.** Swiss: Inter Tight, an off-white background, black text, one red accent, square corners, a strict grid. Use the shared components in `src/components/`; don't restyle one-off elements.
+- **Forms.** One column. Every field has a real `<label>`. Errors sit under the field (linked with `aria-describedby`) and say what to do next, and the typed value is never cleared on error.
+- **Accessibility.** Everything works with a keyboard, and focus is always visible.
+- **Dependencies.** Don't add packages beyond what create-next-app installed unless the user agrees.
